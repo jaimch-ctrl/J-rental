@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="robots" content="noindex,nofollow">
+<title>J攝影師租機｜管理後台</title>
+<style>
+:root{--bg:#0d1626;--panel:#16233a;--panel2:#1d2d49;--line:#30435f;--text:#f2f5fa;--muted:#a9b6c9;--gold:#e9b949;--goldt:#1b1403;--green:#4fd18b;--rose:#fb7185}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--bg);color:var(--text);font-weight:600;font-size:16px;line-height:1.55;font-family:-apple-system,BlinkMacSystemFont,"PingFang TC","Noto Sans TC","Microsoft JhengHei",sans-serif}
+#app{max-width:640px;margin:0 auto;padding:18px 14px 60px}
+h1{font-size:24px;font-weight:900;color:var(--gold);margin:6px 0 14px}
+label{display:block;font-size:15px;margin:12px 0 4px}
+input,select,textarea{width:100%;min-height:46px;padding:9px 11px;background:var(--panel2);color:var(--text);border:1px solid var(--line);border-radius:10px;font-size:16px;font-weight:600;font-family:inherit}
+input:focus,select:focus,textarea:focus,button:focus-visible{outline:2px solid var(--gold);outline-offset:1px}
+button{font-family:inherit;cursor:pointer}
+.btn{min-height:46px;padding:8px 14px;border-radius:10px;border:1.5px solid var(--line);background:var(--panel2);color:var(--text);font-size:15px;font-weight:800}
+.btn.main{background:var(--gold);border-color:var(--gold);color:var(--goldt)}
+.btn.danger{color:var(--rose);border-color:var(--rose);background:transparent}
+.tabs{display:flex;gap:6px;margin-bottom:12px;overflow-x:auto}
+.tabs button{flex:1 0 auto;min-height:44px;padding:6px 14px;border-radius:999px;border:1.5px solid var(--line);background:transparent;color:var(--muted);font-weight:800;font-size:15px}
+.tabs button[aria-pressed=true]{background:var(--gold);border-color:var(--gold);color:var(--goldt)}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:15px;margin:0 0 12px}
+.top{display:flex;justify-content:space-between;align-items:center;gap:8px}
+.id{font-weight:900;color:var(--gold);overflow-wrap:anywhere}
+.pill{flex:none;padding:2px 10px;border-radius:999px;font-size:14px;border:1px solid var(--muted);color:var(--muted)}
+.pill.warn{border-color:var(--gold);color:var(--gold)}.pill.good{border-color:var(--green);color:var(--green)}.pill.bad{border-color:var(--rose);color:var(--rose)}
+.name{font-size:19px;font-weight:900;margin-top:6px}
+.kv{display:flex;justify-content:space-between;gap:12px;padding:5px 0;border-bottom:1px solid var(--line);font-size:15px}
+.kv span:first-child{color:var(--muted);flex:none}
+.kv span:last-child{text-align:right;overflow-wrap:anywhere}
+.acts{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}
+.acts .btn{flex:1 1 30%}
+.muted{color:var(--muted)}
+.err{color:var(--rose);min-height:1.5em;margin:8px 0 0}
+#modal{position:fixed;inset:0;background:rgba(5,10,20,.75);display:flex;align-items:flex-end;justify-content:center;z-index:10}
+#sheet{background:var(--panel);width:100%;max-width:560px;max-height:90vh;overflow:auto;border-radius:16px 16px 0 0;padding:18px 16px calc(18px + env(safe-area-inset-bottom))}
+#sheet h2{margin:0 0 6px;font-size:20px;color:var(--gold)}
+.row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.preview{margin-top:12px;padding:10px 12px;background:var(--panel2);border-radius:10px}
+.bar{display:flex;gap:8px;margin-top:14px}.bar .btn{flex:1}
+[hidden]{display:none!important}
+#print{display:none}
+@media print{
+  body{background:#fff;color:#000;font-weight:400}
+  #app,#modal,.noprint{display:none!important}
+  #print,#print.show{display:block!important;position:static!important;overflow:visible!important;padding:0!important}
+}
+#print.show{display:block;position:fixed;inset:0;background:#fff;color:#000;overflow:auto;z-index:20;padding:16px;font-weight:400}
+#print.show .doc{max-width:720px;margin:0 auto}
+.doc h3{font-size:24px;text-align:center;margin:0 0 6px}
+.doc h4{font-size:18px;margin:16px 0 6px}
+.doc p{margin:3px 0;line-height:1.7;font-size:15px}
+.doc p.s{font-weight:800}
+.doc .box{border:1px solid #000;padding:8px 12px;margin:8px 0}
+.printbar{display:flex;gap:8px;max-width:720px;margin:0 auto 12px}
+.printbar .btn{flex:1;background:#fff;color:#000;border-color:#000}
+</style>
+</head>
+<body>
+<div id="app">
+  <h1>J攝影師租機｜後台</h1>
+  <form id="login">
+    <label for="pw">後台密碼</label>
+    <input id="pw" type="password" autocomplete="current-password">
+    <p class="err" id="loginErr" role="alert"></p>
+    <button class="btn main" style="width:100%" type="submit">登入</button>
+  </form>
+  <div id="panel" hidden>
+    <div class="tabs" id="tabs"></div>
+    <div id="list"></div>
+    <button class="btn" style="width:100%" id="reload">重新整理</button>
+  </div>
+</div>
+<div id="modal" hidden><div id="sheet" role="dialog" aria-modal="true"></div></div>
+<div id="print"></div>
+<script src="core.js"></script>
+<script>
+var CONTRACT=[{"k": "h1", "t": "手機及配件租賃合約書"}, {"k": "p", "t": "合約編號：＿＿＿＿＿＿＿＿"}, {"k": "p", "t": "甲乙雙方就手機及相關配件租賃事宜，經雙方同意，訂立本合約，並共同遵守以下條款。"}, {"k": "h2", "t": "第一條｜租賃雙方資料"}, {"k": "s", "t": "甲方（出租人）"}, {"k": "p", "t": "姓名／店家名稱：J攝影師租機"}, {"k": "p", "t": "聯絡電話：＿＿＿＿＿＿＿＿＿＿＿＿＿＿"}, {"k": "p", "t": "聯絡地址：＿＿＿＿＿＿＿＿＿＿＿＿＿＿"}, {"k": "s", "t": "乙方（承租人）"}, {"k": "p", "t": "姓名：＿＿＿＿＿＿＿＿＿＿＿＿＿＿＿＿"}, {"k": "p", "t": "身分證／護照號碼：＿＿＿＿＿＿＿＿＿＿"}, {"k": "p", "t": "聯絡電話：＿＿＿＿＿＿＿＿＿＿＿＿＿＿"}, {"k": "p", "t": "聯絡地址：＿＿＿＿＿＿＿＿＿＿＿＿＿＿"}, {"k": "p", "t": "緊急聯絡人及電話：＿＿＿＿＿＿＿＿＿＿"}, {"k": "h2", "t": "第二條｜租賃設備及配件"}, {"k": "p", "t": "手機品牌及型號：vivo X300 Ultra"}, {"k": "p", "t": "手機容量／顏色：256GB／＿＿＿＿＿＿＿"}, {"k": "p", "t": "手機序號／IMEI：＿＿＿＿＿＿＿＿＿＿＿"}, {"k": "p", "t": "增距鏡型號：＿＿＿＿＿＿＿＿＿＿＿＿＿"}, {"k": "p", "t": "其他配件：＿＿＿＿＿＿＿＿＿＿＿＿＿＿"}, {"k": "p", "t": "取機時設備外觀及功能狀況：＿＿＿＿＿＿"}, {"k": "p", "t": "隨附配件及數量：＿＿＿＿＿＿＿＿＿＿＿"}, {"k": "p", "t": "甲乙雙方應於取機時共同確認設備及配件之外觀、功能及數量，並以照片或影片記錄，作為日後歸還檢查及責任認定之依據。"}, {"k": "h2", "t": "第三條｜租賃期間及租金"}, {"k": "p", "t": "一、租借起始時間：＿＿年＿＿月＿＿日＿＿時＿＿分。"}, {"k": "p", "t": "二、預定歸還時間：＿＿年＿＿月＿＿日＿＿時＿＿分。"}, {"k": "p", "t": "三、租賃期間以日為計算單位。凡跨越日曆日（即有隔夜情形）者，即計為2日；若租期超過2日，其後之計費方式以此類推。實際借還手機之時間點不影響天數之計算；另於同一日內借出並歸還者，以 1 日計算。"}, {"k": "p", "t": "四、本次租賃方案及費用如下："}, {"k": "p", "t": "租賃方案：＿＿＿＿＿＿＿＿＿＿＿＿＿＿"}, {"k": "p", "t": "租賃天數：＿＿＿＿日"}, {"k": "p", "t": "約定租金：新臺幣＿＿＿＿＿＿元"}, {"k": "p", "t": "押金：新臺幣＿＿＿＿＿＿元"}, {"k": "p", "t": "預約金（租金之 30%，取機時折抵租金）：新臺幣＿＿＿＿＿＿元"}, {"k": "p", "t": "應付總額：新臺幣＿＿＿＿＿＿元"}, {"k": "p", "t": "取機時應付（租金餘額＋押金）：新臺幣＿＿＿＿＿＿元"}, {"k": "p", "t": "五、預約金、租金餘額及押金之支付，依第三條之一約定辦理。"}, {"k": "box", "t": "方案一｜一般日租"}, {"k": "box", "t": "手機：NT$1,000。"}, {"k": "box", "t": "手機+200mm增距鏡：NT$1,300"}, {"k": "box", "t": "手機+400mm增距鏡：NT$1,500"}, {"k": "box", "t": "方案二｜長租優惠"}, {"k": "box", "t": "承租滿 3 日以上：日租費用乘以租借天數再乘0.9計算。"}, {"k": "box", "t": "承租滿 5 日以上：日租費用乘以租借天數再乘0.85計算。"}, {"k": "box", "t": "方案三｜介紹人專案（免押金）"}, {"k": "box", "t": "連續承租 5 日，手機+200mm增距鏡：NT$5,500。"}, {"k": "box", "t": "連續承租 5 日，手機+400mm增距鏡：NT$6,000。"}, {"k": "h2", "t": "第三條之一｜預約金及取消規定"}, {"k": "p", "t": "一、乙方應於預約後 24 小時內匯付租金 30% 之預約金（取機時間較近者，依預約時所示期限），經甲方確認入帳後預約始成立；逾期未付，預約自動取消。"}, {"k": "p", "t": "二、預約金於取機時全額折抵租金，不得折抵押金。租金餘額及押金應於取機時付清。"}, {"k": "p", "t": "三、乙方取消時，依通知日距取機日之日數處理：取機日 7 日前通知者，全額退還預約金；取機日前 3 至 6 日通知者，退還 50%；未滿 3 日通知或未到場取機者，不予退還。"}, {"k": "p", "t": "四、乙方於取機日 3 日前提出且尚有檔期者，得改期一次，預約金保留。"}, {"k": "p", "t": "五、乙方參加之活動經主辦單位取消或延期者，乙方憑主辦單位公告得改期一次，預約金保留，不予退還。"}, {"k": "p", "t": "六、因可歸責於甲方之事由致無法出租者，甲方應加倍返還預約金。"}, {"k": "h2", "t": "第四條｜臨時加租費用"}, {"k": "p", "t": "一、乙方如於原定租賃期間內臨時提出加租需求，應事先通知甲方，並經甲方同意後，始得延長使用期間。"}, {"k": "p", "t": "二、臨時加租費用為每小時新臺幣 100 元。（適用於所有方案）"}, {"k": "p", "t": "三、乙方未經甲方同意，不得自行延長租賃期間。若有逾時歸還情形，依第五條約定辦理。"}, {"k": "h2", "t": "第五條｜逾時歸還規定"}, {"k": "p", "t": "一、乙方應依本合約約定之日期及時間歸還手機及全部配件。"}, {"k": "p", "t": "二、逾約定歸還時間未滿 30 分鐘者，不另收費。"}, {"k": "p", "t": "三、逾約定歸還時間達 30 分鐘以上、未超過 4 小時者，視同加租 4 小時，收取新臺幣 400 元。"}, {"k": "p", "t": "四、逾約定歸還時間超過 4 小時者，加收一日租金（依方案一單日價格計算）。"}, {"k": "p", "t": "五、前二款費用得自押金扣抵，餘額退還；無押金或押金不足者，乙方應另行支付。"}, {"k": "p", "t": "六、如遇突發事故或不可抗力等特殊情況，乙方應儘速通知甲方，雙方得協議處理。"}, {"k": "p", "t": "七、前述押金扣抵及違約金約定，仍應符合相關法律規定；如有爭議，依實際情況及法律規定處理。"}, {"k": "h2", "t": "第六條｜押金及退還方式"}, {"k": "p", "t": "一、國內租借押金為新臺幣 5,000 元。"}, {"k": "p", "t": "二、國外租借押金為新臺幣 10,000 元。"}, {"k": "p", "t": "三、本次租借押金："}, {"k": "p", "t": "□ 國內租借：新臺幣 5,000 元"}, {"k": "p", "t": "□ 國外租借：新臺幣10,000 元"}, {"k": "p", "t": "□ 介紹人專案：免押金"}, {"k": "p", "t": "四、乙方依約歸還手機及全部配件後，甲方應檢查設備之外觀、功能及配件數量。"}, {"k": "p", "t": "五、經確認設備及配件均無異常，且無其他依約應由乙方負擔之費用後，甲方應退還押金。"}, {"k": "p", "t": "六、如有逾時、損壞、遺失或其他應負擔之費用，甲方應向乙方說明扣款原因及金額，並依本合約及相關法律規定處理。"}, {"k": "p", "t": "七、如應賠償金額超過押金，乙方仍應就依法應負擔之差額負責。"}, {"k": "h2", "t": "第七條｜身分核對及未成年承租人"}, {"k": "p", "t": "一、乙方取機時須提供兩種有效證件供甲方核對，並依雙方約定提供一項證件或其他合法擔保方式。"}, {"k": "p", "t": "二、甲方應妥善處理乙方之個人資料，僅於租賃管理、聯絡及依法處理爭議等必要範圍內使用。"}, {"k": "p", "t": "三、不租借給未滿 18 歲之乙方。"}, {"k": "h2", "t": "第八條｜取機及歸還檢查"}, {"k": "p", "t": "一、交付手機時，甲乙雙方應共同檢查手機、增距鏡及全部配件，確認手機外觀及內部各項功能完整無損、運作正常，並確認配件完整、數量無誤，拍攝照片或影片留存。"}, {"k": "p", "t": "二、甲乙雙方完成前項檢查並共同確認無誤後，辦理手機及配件之交付。"}, {"k": "p", "t": "三、歸還時，甲乙雙方應再次確認設備及配件狀況，並拍攝照片或影片留存。"}, {"k": "p", "t": "四、如發現損壞、異常或配件短少，雙方應共同確認並記錄，必要時提供維修檢測資料，以釐清責任。"}, {"k": "p", "t": "五、設備檢查完成且無應扣款項目後，甲方應依約退還押金。"}, {"k": "h2", "t": "第九條｜設備損壞及賠償責任"}, {"k": "p", "t": "一、租賃期間，乙方應妥善保管手機、增距鏡及全部配件，不得擅自轉租、轉借、拆解或以不當方式使用。"}, {"k": "p", "t": "二、因乙方故意或過失造成設備或配件損壞、遺失或無法正常使用者，乙方應依實際責任負擔合理之維修費用或損害賠償。"}, {"k": "p", "t": "三、手機及增距鏡如有損壞，依雙方約定及實際責任處理。甲方應提供合理之維修估價、維修單據或其他可供確認之資料。"}, {"k": "p", "t": "四、設備損壞可歸責於乙方且可修復者，乙方負擔維修費 80%，甲方負擔 20%，約定如下："}, {"k": "p", "t": "計算基準：以原廠或授權維修中心出具之估價單或收據所載金額為準，含零件及工資。"}, {"k": "p", "t": "適用情形：摔落、撞擊、進水、螢幕或鏡頭破損等可修復之損壞。"}, {"k": "p", "t": "全損賠償：設備遺失、遭竊未能尋回、無法修復或因故意損壞者，不適用前述 80%，乙方應按市價全額賠償。市價以維修或事故確認當日兩家通訊行同型號、同容量之公開報價平均計算，甲方應提供報價資料供乙方確認。"}, {"k": "p", "t": "押金暫留：維修費待確認期間，甲方得暫留押金，並於取得估價單或維修單據後 3 日內結算退還。"}, {"k": "p", "t": "五、設備損壞如非可歸責於乙方之事由，或屬原有瑕疵、正常合理使用所生之情形，應依實際證據及相關法律規定釐清責任。"}, {"k": "p", "t": "六、設備如遭竊、遺失或發生重大故障，乙方應立即通知甲方，並於必要時配合報警或相關調查。"}, {"k": "h2", "t": "第十條｜資料轉移及個人資料"}, {"k": "p", "t": "一、乙方應自行安排手機資料轉移、備份及相關設定所需時間，不得要求甲方無償延長租賃期間。"}, {"k": "p", "t": "二、如因資料轉移需要延長使用時間，乙方應事先取得甲方同意，並依雙方約定辦理。"}, {"k": "p", "t": "三、乙方歸還前應自行備份個人資料、登出個人帳號，並依甲方指示完成必要之資料清除或恢復原廠設定程序。"}, {"k": "p", "t": "四、甲方不得任意存取、利用或揭露乙方之個人資料。"}, {"k": "p", "t": "五、雙方提供之個人資料，應依個人資料保護相關法令處理。"}, {"k": "h2", "t": "第十一條｜合約效力及其他約定"}, {"k": "p", "t": "一、本合約未盡事宜，得由甲乙雙方另以書面補充約定。"}, {"k": "p", "t": "二、雙方因本合約發生爭議時，應先本於誠信原則協商；協商不成時，依中華民國相關法律處理。"}, {"k": "p", "t": "三、本合約經甲乙雙方確認內容並簽名後生效。"}, {"k": "p", "t": "四、本合約一式兩份，由甲乙雙方各執一份為憑。"}, {"k": "h2", "t": "簽署欄"}, {"k": "p", "t": "甲方（出租人）簽名：＿＿＿＿＿＿＿＿＿"}, {"k": "p", "t": "乙方（承租人）簽名：＿＿＿＿＿＿＿＿＿"}, {"k": "p", "t": "簽約日期：＿＿年＿＿月＿＿日"}, {"k": "p", "t": "取機確認時間：＿＿年＿＿月＿＿日＿＿時＿＿分"}, {"k": "p", "t": "歸還確認時間：＿＿年＿＿月＿＿日＿＿時＿＿分"}, {"k": "p", "t": "押金退還金額：新臺幣＿＿＿＿＿＿元"}, {"k": "p", "t": "其他備註：＿＿＿＿＿＿＿＿＿＿＿＿＿＿"}];
+var $=function(id){return document.getElementById(id)};
+var A={pw:'',orders:[],shop:{},now:null,tab:'todo'};
+var TABS=[['todo','待處理',['待匯款','待對帳','已確認']],['out','出租中',['已取機']],['all','全部',null]];
+var PILL={'待對帳':'warn','待匯款':'warn','已確認':'good','已取機':'good','已取消':'bad','逾期未付':'bad'};
+function el(t,c,x){var e=document.createElement(t);if(c)e.className=c;if(x!==undefined)e.textContent=x;return e}
+function api(q){q.password=A.pw;return fetch(API_URL,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify(q)}).then(function(r){return r.json()})}
+function today(){return dateOf(A.now||fmtMs(Date.now()))}
+function load(){
+  return api({action:'admin_list'}).then(function(r){
+    if(!r.ok)throw new Error(r.err);
+    A.orders=r.orders;A.shop=r.shop;A.now=r.now;
+    $('login').hidden=true;$('panel').hidden=false;
+    try{sessionStorage.setItem('pw',A.pw)}catch(e){}
+    render();
+  });
+}
+function render(){
+  var t=$('tabs');t.textContent='';
+  TABS.forEach(function(x){
+    var c=x[2]?A.orders.filter(function(o){return x[2].indexOf(o.status)>=0}).length:A.orders.length;
+    var b=el('button','',x[1]+' '+c);b.type='button';b.setAttribute('aria-pressed',A.tab===x[0]?'true':'false');
+    b.onclick=function(){A.tab=x[0];render()};t.appendChild(b);
+  });
+  var tab=TABS.filter(function(x){return x[0]===A.tab})[0],list=A.orders.slice();
+  if(tab[2]){list=list.filter(function(o){return tab[2].indexOf(o.status)>=0});list.sort(function(a,b){return a.start<b.start?-1:1})}
+  var box=$('list');box.textContent='';
+  if(!list.length)box.appendChild(el('p','muted','目前沒有訂單。'));
+  list.forEach(function(o){box.appendChild(card(o))});
+}
+function kv(p,a,b){var r=el('div','kv');r.appendChild(el('span','',a));r.appendChild(el('span','',b));p.appendChild(r)}
+function card(o){
+  var c=el('div','card'),top=el('div','top');
+  top.appendChild(el('span','id',o.id));top.appendChild(el('span','pill '+(PILL[o.status]||''),o.status));c.appendChild(top);
+  c.appendChild(el('div','name',o.name+'　'+o.phone));
+  if(o.social)c.appendChild(el('div','muted','IG／脆：'+o.social));
+  kv(c,'配備',o.equipLabel);kv(c,'方案',o.planLabel);kv(c,'取機',o.start);kv(c,'歸還',o.end);kv(c,'面交地點',o.place);
+  if(o.event)kv(c,'活動',o.event);
+  kv(c,'租金／押金',money(o.rent)+'／'+money(o.deposit)+'（'+o.region+'）');
+  kv(c,'預約金',money(o.prepay));kv(c,'取機應付',money(o.dueAtPickup));
+  if(o.status==='待匯款')kv(c,'匯款期限',o.deadline);
+  if(o.last5)kv(c,'匯款後五碼',o.last5);
+  if(o.refCode)kv(c,'介紹碼',o.refCode);
+  if(o.unit)kv(c,'序號／編號',o.unit);
+  if(o.extendFee)kv(c,'加租費',money(o.extendFee));
+  if(o.status==='已歸還'){kv(c,'實際歸還',o.returnedAt);kv(c,'逾時費',money(o.lateFee));kv(c,'其他費用',money(o.otherFee));kv(c,'押金退還',money(o.depositBack));if(o.shortfall)kv(c,'應另收',money(o.shortfall))}
+  if(o.status==='已取消'){kv(c,'取消原因',o.cancelReason);kv(c,'應退預約金',money(o.refund))}
+  if(o.note)kv(c,'備註',o.note);
+  var a=el('div','acts');
+  function act(t,f,cls){var b=el('button','btn '+(cls||''),t);b.type='button';b.onclick=f;a.appendChild(b)}
+  if(['待匯款','待對帳','逾期未付'].indexOf(o.status)>=0)act('確認入帳',function(){dlgConfirm(o)},'main');
+  if(o.status==='已確認')act('登記取機',function(){dlgPickup(o)},'main');
+  if(o.status==='已取機')act('登記歸還',function(){dlgReturn(o)},'main');
+  if(['已確認','已取機'].indexOf(o.status)>=0)act('延長時間',function(){dlgExtend(o)});
+  if(['待匯款','待對帳','已確認'].indexOf(o.status)>=0&&!o.reschedules)act('改期',function(){dlgResch(o)});
+  if(['已確認','已取機','已歸還'].indexOf(o.status)>=0)act('列印合約',function(){showContract(o)});
+  act('備註',function(){dlgNote(o)});
+  if(['待匯款','待對帳','已確認'].indexOf(o.status)>=0)act('取消訂單',function(){dlgCancel(o)},'danger');
+  c.appendChild(a);
+  return c;
+}
+/* ---- 對話框 ---- */
+function modal(title,build,onOk,okText){
+  var s=$('sheet');s.textContent='';s.appendChild(el('h2','',title));
+  var body=el('div');s.appendChild(body);build(body);
+  var e=el('p','err');e.setAttribute('role','alert');s.appendChild(e);
+  var bar=el('div','bar'),no=el('button','btn','取消返回'),ok=el('button','btn main',okText||'確定');no.type=ok.type='button';
+  no.onclick=close;
+  ok.onclick=function(){
+    var q;try{q=onOk()}catch(x){e.textContent=x.message;return}
+    ok.disabled=true;e.textContent='';
+    api(q).then(function(r){ok.disabled=false;if(!r.ok){e.textContent=r.err;return}close();load()}).catch(function(){ok.disabled=false;e.textContent='連線失敗，請再試一次'});
+  };
+  bar.appendChild(no);bar.appendChild(ok);s.appendChild(bar);$('modal').hidden=false;
+}
+function close(){$('modal').hidden=true}
+function field(p,label,tag,attrs){
+  var id='f'+Math.random().toString(36).slice(2,8),l=el('label','',label);l.htmlFor=id;p.appendChild(l);
+  var i=document.createElement(tag||'input');i.id=id;for(var k in (attrs||{}))i[k]=attrs[k];p.appendChild(i);return i;
+}
+function slotSelect(p,label,val){
+  var s=field(p,label,'select');timeSlots().forEach(function(t){var o=el('option','',t);o.value=t;s.appendChild(o)});if(val)s.value=val;return s;
+}
+function nowParts(){var n=A.now||fmtMs(Date.now());return{d:dateOf(n),t:timeOf(n)}}
+function dlgConfirm(o){modal('確認入帳',function(b){
+  b.appendChild(el('p','','請確認已收到 '+money(o.prepay)+(o.last5?'，帳號後五碼 '+o.last5:'')+'。'));
+},function(){return{action:'admin_confirm',id:o.id}},'確認已入帳')}
+function dlgPickup(o){var u;modal('登記取機',function(b){
+  b.appendChild(el('p','','收取 '+money(o.dueAtPickup)+'，核對兩種證件並簽署合約。'));
+  u=field(b,'手機序號或增距鏡編號（選填）','input',{type:'text',maxLength:80});
+},function(){return{action:'admin_pickup',id:o.id,unit:u.value}},'確認取機')}
+function dlgReturn(o){var d,t,x,pv,n=nowParts();
+  function up(){
+    var a=d.value+' '+t.value,other=Math.max(0,Math.round(+x.value||0));pv.textContent='';
+    if(isNaN(toMs(a))){pv.textContent='請填寫實際歸還時間';return}
+    var late=lateFee(o.end,a,o.daily),owed=(o.extendFee||0)+late+other;
+    [['約定歸還',o.end],['逾時費',money(late)],['加租費',money(o.extendFee)],['其他費用',money(other)],['押金退還',money(Math.max(0,o.deposit-owed))]].forEach(function(r){kv(pv,r[0],r[1])});
+    if(owed>o.deposit)kv(pv,'應另收',money(owed-o.deposit));
+  }
+  modal('登記歸還',function(b){
+    var r=el('div','row');b.appendChild(r);var c1=el('div'),c2=el('div');r.appendChild(c1);r.appendChild(c2);
+    d=field(c1,'歸還日期','input',{type:'date',value:n.d});t=field(c2,'歸還時間','input',{type:'time',value:n.t});
+    x=field(b,'損壞或其他費用（元）','input',{type:'number',min:'0',inputMode:'numeric',value:'0'});
+    pv=el('div','preview');b.appendChild(pv);[d,t,x].forEach(function(i){i.oninput=up});up();
+  },function(){return{action:'admin_return',id:o.id,actual:d.value+' '+t.value,other:x.value}},'確認歸還');
+}
+function dlgExtend(o){var d,t,pv;
+  function up(){pv.textContent='';var a=d.value+' '+t.value;if(isNaN(toMs(a))||toMs(a)<=toMs(o.end)){pv.textContent='新時間需晚於 '+o.end;return}kv(pv,'加租費',money(extendFee(o.end,a)))}
+  modal('延長時間',function(b){
+    b.appendChild(el('p','muted','每小時 NT$100，不足一小時以一小時計。'));
+    var r=el('div','row');b.appendChild(r);var c1=el('div'),c2=el('div');r.appendChild(c1);r.appendChild(c2);
+    d=field(c1,'新歸還日期','input',{type:'date',value:dateOf(o.end)});t=field(c2,'新歸還時間','input',{type:'time',value:timeOf(o.end)});
+    pv=el('div','preview');b.appendChild(pv);[d,t].forEach(function(i){i.oninput=up});up();
+  },function(){return{action:'admin_extend',id:o.id,newEnd:d.value+' '+t.value}},'確認延長');
+}
+function dlgResch(o){var ds,ts,de,te,r0;modal('改期（限一次）',function(b){
+  r0=field(b,'改期原因','select');[['customer','客人改期（取機 3 日前）'],['event','活動遭取消或延期']].forEach(function(x){var e=el('option','',x[1]);e.value=x[0];r0.appendChild(e)});
+  var r=el('div','row');b.appendChild(r);var c1=el('div'),c2=el('div');r.appendChild(c1);r.appendChild(c2);
+  ds=field(c1,'新取機日','input',{type:'date',value:dateOf(o.start)});ts=slotSelect(c2,'新取機時間',timeOf(o.start));
+  var r2=el('div','row');b.appendChild(r2);var c3=el('div'),c4=el('div');r2.appendChild(c3);r2.appendChild(c4);
+  de=field(c3,'新歸還日','input',{type:'date',value:dateOf(o.end)});te=slotSelect(c4,'新歸還時間',timeOf(o.end));
+},function(){return{action:'admin_reschedule',id:o.id,reason:r0.value,start:ds.value+' '+ts.value,end:de.value+' '+te.value}},'確認改期')}
+function dlgCancel(o){var r,pv;
+  function up(){pv.textContent='';kv(pv,'應退預約金',money(cancelRefund(o.prepay,dateOf(o.start),today(),r.value,o.status!=='待匯款')))}
+  modal('取消訂單',function(b){
+    r=field(b,'取消原因','select');[['customer','客人取消'],['noshow','未到場'],['owner','甲方因素（加倍返還）']].forEach(function(x){var e=el('option','',x[1]);e.value=x[0];r.appendChild(e)});
+    pv=el('div','preview');b.appendChild(pv);r.onchange=up;up();
+  },function(){return{action:'admin_cancel',id:o.id,reason:r.value}},'確認取消');
+}
+function dlgNote(o){var n;modal('備註',function(b){n=field(b,'備註內容','textarea',{rows:4,maxLength:500,value:o.note||''})},function(){return{action:'admin_note',id:o.id,note:n.value}},'儲存')}
+
+/* ---- 合約 ---- */
+function fillBlanks(line,vals){var i=0;return line.replace(/＿+/g,function(m){var v=vals[i++];return v===undefined||v===''?m:v})}
+function num(n){return Number(n||0).toLocaleString('en-US')}
+function dt(s){return[s.slice(0,4),s.slice(5,7),s.slice(8,10),s.slice(11,13),s.slice(14,16)]}
+function contractLines(o){
+  var phone=0,addr=0,ref=o.plan==='referral',lens=RULES.equipment[o.equip].lens;
+  return CONTRACT.map(function(c){
+    var t=c.t;
+    function has(p){return t.indexOf(p)===0}
+    if(has('合約編號'))t=fillBlanks(t,[o.id]);
+    else if(has('聯絡電話'))t=fillBlanks(t,[phone++===0?A.shop.phone:o.phone]);
+    else if(has('聯絡地址')){if(addr++===0)t=fillBlanks(t,[A.shop.address])}
+    else if(has('姓名：'))t=fillBlanks(t,[o.name]);
+    else if(has('手機序號'))t=fillBlanks(t,[o.unit]);
+    else if(has('增距鏡型號'))t=fillBlanks(t,[lens?lens+'mm':'無']);
+    else if(has('一、租借起始時間'))t=fillBlanks(t,dt(o.start));
+    else if(has('二、預定歸還時間'))t=fillBlanks(t,dt(o.end));
+    else if(has('租賃方案'))t=fillBlanks(t,[o.planLabel+'，'+o.equipLabel]);
+    else if(has('租賃天數'))t=fillBlanks(t,[String(o.days)]);
+    else if(has('約定租金'))t=fillBlanks(t,[num(o.rent)]);
+    else if(has('押金：新臺幣'))t=fillBlanks(t,[num(o.deposit)]);
+    else if(has('預約金（'))t=fillBlanks(t,[num(o.prepay)]);
+    else if(has('應付總額'))t=fillBlanks(t,[num(o.rent+o.deposit)]);
+    else if(has('取機時應付'))t=fillBlanks(t,[num(o.dueAtPickup)]);
+    else if(has('□ 國內租借')&&!ref&&o.region==='國內')t=t.replace('□','☑');
+    else if(has('□ 國外租借')&&!ref&&o.region==='國外')t=t.replace('□','☑');
+    else if(has('□ 介紹人專案')&&ref)t=t.replace('□','☑');
+    return{k:c.k,t:t};
+  });
+}
+function showContract(o){
+  var p=$('print');p.textContent='';p.className='show';
+  var bar=el('div','printbar noprint'),b1=el('button','btn','列印／存成 PDF'),b2=el('button','btn','關閉');b1.type=b2.type='button';
+  b1.onclick=function(){window.print()};b2.onclick=function(){p.className='';p.textContent=''};bar.appendChild(b1);bar.appendChild(b2);p.appendChild(bar);
+  var d=el('div','doc'),box=null;
+  contractLines(o).forEach(function(c){
+    if(c.k==='box'){if(!box){box=el('div','box');d.appendChild(box)}box.appendChild(el('p','',c.t));return}
+    box=null;
+    d.appendChild(el(c.k==='h1'?'h3':c.k==='h2'?'h4':'p',c.k==='s'?'s':'',c.t));
+  });
+  p.appendChild(d);p.scrollTop=0;
+}
+$('login').onsubmit=function(ev){ev.preventDefault();A.pw=$('pw').value;$('loginErr').textContent='';load().catch(function(e){$('loginErr').textContent=e.message||'連線失敗'})};
+$('reload').onclick=function(){load().catch(function(){})};
+(function(){
+  if(API_URL.indexOf('https://')!==0){$('loginErr').textContent='尚未設定後端網址，請先完成安裝。';return}
+  var saved='';try{saved=sessionStorage.getItem('pw')||''}catch(e){}
+  if(saved){A.pw=saved;load().catch(function(){try{sessionStorage.removeItem('pw')}catch(e){}})}
+})();
+</script>
+</body>
+</html>
