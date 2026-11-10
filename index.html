@@ -141,6 +141,9 @@ header a{color:var(--gold)}
         <h2><b>4</b>填寫資料</h2>
         <label for="name">姓名</label><input type="text" id="name" maxlength="40" autocomplete="name" required>
         <label for="phone">手機號碼</label><input type="tel" id="phone" maxlength="20" inputmode="tel" autocomplete="tel" required>
+        <label for="idNo">身分證字號（外籍請填護照號碼）</label><input type="text" id="idNo" maxlength="20" autocapitalize="characters" autocomplete="off" required>
+        <label for="address">聯絡地址</label><input type="text" id="address" maxlength="120" autocomplete="street-address" required>
+        <label for="emergency">緊急聯絡人及電話 <small>（例：王媽媽 0912-345-678）</small></label><input type="text" id="emergency" maxlength="80" required>
         <label for="social">IG 或脆帳號 <small>（方便聯絡）</small></label><input type="text" id="social" maxlength="60" autocapitalize="none">
         <label for="event">活動名稱 <small>（選填）</small></label><input type="text" id="event" maxlength="80">
         <label for="place">希望的面交地點 <small>（中山捷運站搭公車或捷運 20 分鐘內）</small></label><input type="text" id="place" maxlength="80" required>
@@ -403,6 +406,9 @@ $('form').onsubmit=function(ev){
   if(!c||!q||!q.ok||$('slotMsg').className.indexOf('err')>=0){m.textContent='請先選好可預約的日期與時間';return}
   if(!$('name').value.trim()){m.textContent='請填寫姓名';$('name').focus();return}
   if($('phone').value.replace(/\D/g,'').length<8){m.textContent='請填寫正確的手機號碼';$('phone').focus();return}
+  if($('idNo').value.replace(/[^A-Za-z0-9]/g,'').length<6){m.textContent='請填寫身分證或護照號碼';$('idNo').focus();return}
+  if(!$('address').value.trim()){m.textContent='請填寫聯絡地址';$('address').focus();return}
+  if(!$('emergency').value.trim()){m.textContent='請填寫緊急聯絡人及電話';$('emergency').focus();return}
   if(!$('place').value.trim()){m.textContent='請填寫希望的面交地點';$('place').focus();return}
   if(S.ref&&!$('refCode').value.trim()){m.textContent='請填寫介紹碼';$('refCode').focus();return}
   if(!S.ids.front||!S.ids.back||!S.ids.second){m.textContent='請上傳身分證正反面與第二證件';return}
@@ -410,7 +416,7 @@ $('form').onsubmit=function(ev){
   if(!$('adult').checked||!$('agree').checked){m.textContent='請勾選年滿 18 歲並同意規則';return}
   var btn=$('submit');btn.disabled=true;btn.textContent='上傳中，請勿關閉…';
   var phone=$('phone').value.replace(/\D/g,'');
-  api({action:'book',equip:S.equip,plan:S.ref?'referral':'standard',refCode:$('refCode').value,start:c.start,end:c.end,region:$('region').value,name:$('name').value,phone:phone,social:$('social').value,event:$('event').value,place:$('place').value,adult:true,agree:true,website:$('website').value,power:$('power').checked,transfer:$('transfer').value,ids:S.ids,idAgree:true}).then(function(r){
+  api({action:'book',equip:S.equip,plan:S.ref?'referral':'standard',refCode:$('refCode').value,start:c.start,end:c.end,region:$('region').value,name:$('name').value,phone:phone,social:$('social').value,event:$('event').value,place:$('place').value,idNo:$('idNo').value,address:$('address').value,emergency:$('emergency').value,adult:true,agree:true,website:$('website').value,power:$('power').checked,transfer:$('transfer').value,ids:S.ids,idAgree:true}).then(function(r){
     btn.disabled=false;btn.textContent='送出預約與證件';
     if(!r.ok){m.textContent=r.err;refresh();return}
     $('bookView').hidden=true;$('resultView').hidden=false;
