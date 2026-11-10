@@ -182,7 +182,9 @@ function contractLines(o, shop) {
     function has(p) { return t.indexOf(p) === 0; }
     if (has('合約編號')) t = fillBlanks_(t, [o.id]);
     else if (has('聯絡電話')) t = fillBlanks_(t, [phone++ === 0 ? shop.phone : o.phone]);
-    else if (has('聯絡地址')) { if (addr++ === 0) t = fillBlanks_(t, [shop.address]); }
+    else if (has('聯絡地址')) t = fillBlanks_(t, [addr++ === 0 ? shop.address : o.address]);
+    else if (has('身分證／護照號碼')) t = fillBlanks_(t, [o.idNo]);
+    else if (has('緊急聯絡人及電話')) t = fillBlanks_(t, [o.emergency]);
     else if (has('姓名：')) t = fillBlanks_(t, [o.name]);
     else if (has('手機序號')) t = fillBlanks_(t, [o.unit]);
     else if (has('增距鏡型號')) t = fillBlanks_(t, [eq.lens ? eq.lens + 'mm' : '無']);
