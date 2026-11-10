@@ -115,6 +115,7 @@ function card(o){
   top.appendChild(el('span','id',o.id));top.appendChild(el('span','pill '+(PILL[o.status]||''),o.status));c.appendChild(top);
   c.appendChild(el('div','name',o.name+'　'+o.phone));
   if(o.social)c.appendChild(el('div','muted','IG／脆：'+o.social));
+  if(o.idNo)kv(c,'身分證／護照',o.idNo);if(o.address)kv(c,'地址',o.address);if(o.emergency)kv(c,'緊急聯絡人',o.emergency);
   kv(c,'配備',o.equipLabel);kv(c,'方案',o.planLabel);kv(c,'取機',o.start);kv(c,'歸還',o.end);kv(c,'面交地點',o.place);
   if(o.event)kv(c,'活動',o.event);
   kv(c,'租金／押金',money(o.rent)+'／'+money(o.deposit)+'（'+o.region+'）');
