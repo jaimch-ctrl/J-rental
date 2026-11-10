@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>Jspace.cam｜vivo X300 Ultra 手機與增距鏡租借</title>
+<title>J攝影師租機｜vivo X300 Ultra 手機與增距鏡租借</title>
 <meta name="description" content="vivo X300 Ultra 手機與 200mm、400mm 增距鏡租借，線上查檔期、預約。">
 <style>
 :root{--bg:#0d1626;--panel:#16233a;--panel2:#1d2d49;--line:#30435f;--text:#f2f5fa;--muted:#a9b6c9;--gold:#e9b949;--goldt:#1b1403;--green:#4fd18b;--rose:#fb7185}
@@ -71,12 +71,30 @@ footer{padding-bottom:40px;color:var(--muted);font-size:14px}
 footer a{color:var(--gold);margin-right:16px;display:inline-block;padding:8px 0}
 .notice{border-color:var(--rose);color:var(--rose)}
 [hidden]{display:none!important}
+header a{color:var(--gold)}
+.toplink{display:inline-block;margin-top:10px;padding:8px 0;font-size:15px}
+.ups{display:grid;grid-template-columns:1fr;gap:10px;margin-top:8px}
+.up{display:flex;align-items:center;gap:12px;min-height:64px;padding:10px 12px;background:var(--panel2);border:1.5px dashed var(--line);border-radius:10px;cursor:pointer}
+.up.done{border-style:solid;border-color:var(--green)}
+.up img{width:72px;height:48px;object-fit:cover;border-radius:6px;flex:none}
+.up span{flex:1}
+.up em{font-style:normal;color:var(--gold);font-size:14px}
+.vh{position:absolute;width:1px;height:1px;opacity:0;overflow:hidden}
+.addon{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-top:10px}
+.addon select{width:120px}
+.cbox{max-height:50vh;overflow:auto;background:#fff;color:#111;border-radius:10px;padding:12px 14px;margin:10px 0;font-weight:400;font-size:14.5px;line-height:1.7}
+.cbox h3{text-align:center;font-size:19px;margin:0 0 6px}.cbox h4{font-size:16px;margin:12px 0 4px}.cbox p{margin:2px 0}.cbox .bx{border:1px solid #333;padding:6px 10px;margin:6px 0}.cbox .s{font-weight:700}
+#sig{display:block;width:100%;height:170px;background:#fff;border-radius:10px;touch-action:none}
+.row2{display:flex;gap:10px}.row2 .btn{flex:1}
+#print{display:none}
+@media print{body{background:#fff;color:#000}header,main,footer{display:none!important}#print{display:block!important}#print .cbox{max-height:none;overflow:visible;padding:0}}
 </style>
 </head>
 <body>
 <header>
-  <h1>Jspace.cam</h1>
+  <h1>J攝影師租機</h1>
   <p>vivo X300 Ultra 256GB 手機與蔡司增距鏡租借</p>
+  <a class="toplink" href="contract.html">租賃合約範本（可先閱讀、下載）›</a>
 </header>
 <main>
   <div id="setupNotice" class="card notice" hidden>預約系統尚未連線，請先完成安裝設定。</div>
@@ -111,8 +129,11 @@ footer a{color:var(--gold);margin-right:16px;display:inline-block;padding:8px 0}
       <h2><b>3</b>費用</h2>
       <label for="region">租借地區</label>
       <select id="region"><option value="domestic">國內（押金 NT$5,000）</option><option value="foreign">國外（押金 NT$10,000）</option></select>
+      <label class="check"><input type="checkbox" id="power"><span>加租行動電源（每日 NT$50）</span></label>
+      <div class="addon"><label for="transfer" style="margin:0">照片影片導出服務（每次 NT$200，還機時也可再加）</label>
+        <select id="transfer"><option value="0">不需要</option><option value="1">1 次</option><option value="2">2 次</option><option value="3">3 次</option></select></div>
       <table class="sum" style="margin-top:12px"><tbody id="sum"></tbody></table>
-      <p class="hint">預約金匯款確認後才保留檔期，取機時全額折抵租金。租金餘額與押金於面交時付清，押金於歸還檢查後退還。</p>
+      <p class="hint">預約金為租金的 30%，取機時全額折抵租金。租金餘額、押金與加購費用於面交時付清，押金於歸還檢查後退還。</p>
     </section>
 
     <form id="form" novalidate>
@@ -125,11 +146,21 @@ footer a{color:var(--gold);margin-right:16px;display:inline-block;padding:8px 0}
         <label for="place">希望的面交地點 <small>（中山捷運站搭公車或捷運 20 分鐘內）</small></label><input type="text" id="place" maxlength="80" required>
         <p class="hint">國外面交可私訊詢問。</p>
         <div class="hp" aria-hidden="true"><label for="website">網站</label><input type="text" id="website" tabindex="-1" autocomplete="off"></div>
-        <p class="hint">證件於面交時現場核對並簽署紙本合約，網站不收集證件資料。</p>
       </section>
 
       <section>
-        <h2><b>5</b>確認規則</h2>
+        <h2><b>5</b>上傳證件</h2>
+        <p class="hint" style="margin-top:0">我們審核證件後，查詢訂單就會看到匯款帳號。取機時仍需出示正本。</p>
+        <div class="ups">
+          <label class="up" for="idFront"><img alt="" hidden><span>身分證正面</span><em>點此拍照或選照片</em></label><input class="vh" type="file" id="idFront" accept="image/*">
+          <label class="up" for="idBack"><img alt="" hidden><span>身分證反面</span><em>點此拍照或選照片</em></label><input class="vh" type="file" id="idBack" accept="image/*">
+          <label class="up" for="idSecond"><img alt="" hidden><span>第二證件（健保卡或駕照）</span><em>點此拍照或選照片</em></label><input class="vh" type="file" id="idSecond" accept="image/*">
+        </div>
+        <label class="check"><input type="checkbox" id="idAgree"><span>我同意證件影像僅用於身分核對、租賃管理及依法處理爭議，並於租賃結案且無爭議後 30 日內刪除</span></label>
+      </section>
+
+      <section>
+        <h2><b>6</b>確認規則</h2>
         <details>
           <summary>查看租借規則</summary>
           <ul>
@@ -138,13 +169,14 @@ footer a{color:var(--gold);margin-right:16px;display:inline-block;padding:8px 0}
             <li>取機 3 日前可改期一次，預約金保留。活動遭主辦單位取消或延期，憑公告可改期一次，預約金不退。</li>
             <li>逾時未滿 30 分鐘不收費；達 30 分鐘至 4 小時收 NT$400；超過 4 小時加收一日租金。</li>
             <li>可歸責於承租人的可修復損壞，負擔維修費 80%；遺失、無法修復或故意損壞，依當日市價全額賠償。</li>
-            <li>須年滿 18 歲，取機時提供兩種有效證件。歸還前請自行備份、登出帳號。</li>
+            <li>須年滿 18 歲。匯款確認後請於線上簽署合約，取機時出示證件正本。歸還前請自行備份、登出帳號。</li>
           </ul>
+          <p class="hint"><a href="contract.html" style="color:var(--gold)">閱讀完整租賃合約 ›</a></p>
         </details>
         <label class="check"><input type="checkbox" id="adult"><span>我已年滿 18 歲</span></label>
         <label class="check"><input type="checkbox" id="agree"><span>我已閱讀租借規則，並同意上述資料僅用於租賃管理、聯絡及依法處理爭議</span></label>
         <p class="msg err" id="formMsg" role="alert"></p>
-        <button class="btn" id="submit" type="submit">送出預約</button>
+        <button class="btn" id="submit" type="submit">送出預約與證件</button>
       </section>
     </form>
   </div>
@@ -163,6 +195,7 @@ footer a{color:var(--gold);margin-right:16px;display:inline-block;padding:8px 0}
   </section>
 </main>
 <footer><span id="links"></span></footer>
+<div id="print"></div>
 <script src="core.js"></script>
 <script>
 var $=function(id){return document.getElementById(id)};
@@ -238,7 +271,7 @@ function chosen(){
 }
 function quote(){
   var c=chosen();if(!c)return null;
-  return calcQuote({equip:S.equip,plan:S.ref?'referral':'standard',start:c.start,end:c.end,region:$('region').value});
+  return calcQuote({equip:S.equip,plan:S.ref?'referral':'standard',start:c.start,end:c.end,region:$('region').value,power:$('power').checked,transfer:$('transfer').value});
 }
 function renderSum(){
   var body=$('sum'),q=quote(),msg=$('slotMsg');body.textContent='';msg.textContent='';msg.className='msg';
@@ -253,8 +286,10 @@ function renderSum(){
   line(q.equipLabel+'，'+q.days+' 日',money(q.rent));
   line(q.planLabel.replace(/^方案.｜/,''),'');
   line('押金',money(q.deposit));
-  line('現在匯款：預約金 30%',money(q.prepay),true);
-  line('取機時付清（租金餘額＋押金）',money(q.dueAtPickup));
+  if(q.powerFee)line('行動電源 '+q.days+' 日',money(q.powerFee));
+  if(q.transferFee)line('照片影片導出 '+q.transfer+' 次',money(q.transferFee));
+  line('審核通過後匯款：預約金',money(q.prepay),true);
+  line('取機時付清（餘額＋押金＋加購）',money(q.dueAtPickup));
 }
 function renderAll(){renderEquip();renderCal();renderTimes();renderSum()}
 
@@ -265,7 +300,11 @@ function showOrder(box,o,withReport){
   c.appendChild(el('div','oid',o.id));
   var s=el('div','');s.style.margin='6px 0 10px';s.appendChild(el('span','status',o.status));c.appendChild(s);
   function kv(a,b){var r=el('div','kv');r.appendChild(el('span','',a));r.appendChild(el('span','',b));c.appendChild(r)}
-  kv('配備',o.equipLabel);kv('取機',o.start);kv('歸還',o.end);kv('租金（'+o.days+' 日）',money(o.rent));kv('押金',money(o.deposit));kv('預約金',money(o.prepay));kv('取機時付清',money(o.dueAtPickup));
+  kv('配備',o.equipLabel);kv('取機',o.start);kv('歸還',o.end);kv('租金（'+o.days+' 日）',money(o.rent));kv('押金',money(o.deposit));
+  if(o.addonFee)kv('加購',(o.power?'行動電源 ':'')+(o.transferQty?'照片導出 '+o.transferQty+' 次 ':'')+money(o.addonFee));
+  kv('預約金',money(o.prepay));kv('取機時付清',money(o.dueAtPickup));
+  if(o.status==='待審核')c.appendChild(el('p','msg ok','已收到預約與證件，我們會盡快審核。審核通過後，用訂單編號和電話查詢，就會看到匯款帳號。'));
+  if(o.status==='證件未通過')c.appendChild(el('p','msg err','證件未通過：'+(o.rejectReason||'')+'。檔期已釋出，可重新預約或私訊我們。'));
   if(o.bankInfo){
     c.appendChild(el('h2','','請匯款預約金'));
     kv('金額',money(o.prepay));kv('銀行',o.bankInfo.bank||'請私訊詢問');kv('戶名',o.bankInfo.holder||'請私訊詢問');kv('帳號',o.bankInfo.account||'請私訊詢問');kv('匯款期限',o.deadline);
@@ -286,16 +325,74 @@ function showOrder(box,o,withReport){
     };
     c.appendChild(f);
   }
-  if(o.status==='待對帳')c.appendChild(el('p','msg ok','已收到回報，確認入帳後預約即成立。'));
+  if(o.status==='待對帳')c.appendChild(el('p','msg ok','已收到回報，確認入帳後預約即成立，請再回來線上簽約。'));
+  if(o.status==='已確認'&&o.signedAt)c.appendChild(el('p','msg ok','已完成線上簽約（'+o.signedAt+'），取機時請帶證件正本。'));
+  if(o.needSign&&withReport)c.appendChild(signBox(o,withReport,box));
   box.appendChild(c);
 }
 
+function renderContract(target,lines,sigUrl){
+  var bx=null;target.textContent='';
+  lines.forEach(function(c){
+    if(c.k==='box'){if(!bx){bx=el('div','bx');target.appendChild(bx)}bx.appendChild(el('p','',c.t));return}
+    bx=null;
+    if(c.k==='sig'&&sigUrl){var p=el('p','','乙方（承租人）簽名：'),im=document.createElement('img');im.src=sigUrl;im.alt='簽名';im.style.height='56px';im.style.verticalAlign='middle';p.appendChild(im);target.appendChild(p);return}
+    target.appendChild(el(c.k==='h1'?'h3':c.k==='h2'?'h4':'p',c.k==='s'?'s':'',c.t));
+  });
+}
+function signBox(o,phone,box){
+  var w=el('div');w.appendChild(el('h2','','線上簽署合約'));
+  w.appendChild(el('p','hint','匯款已確認。請閱讀合約內容，在下方簽名。'));
+  var cb=el('div','cbox');renderContract(cb,contractLines(o,o.shop));w.appendChild(cb);
+  w.appendChild(el('label','','請在白色框內用手指簽名'));
+  var cv=document.createElement('canvas');cv.id='sig';w.appendChild(cv);
+  var bar=el('div','row2'),clr=el('button','btn ghost','清除重簽');clr.type='button';bar.appendChild(clr);w.appendChild(bar);
+  var ag=el('label','check'),ai=document.createElement('input');ai.type='checkbox';ag.appendChild(ai);ag.appendChild(el('span','','我已閱讀並同意本合約全部內容，以電子簽名簽署'));w.appendChild(ag);
+  var go=el('button','btn','送出簽名');go.type='button';w.appendChild(go);
+  var m=el('p','msg err');m.setAttribute('role','alert');w.appendChild(m);
+  var ctx,drawn=0,last=null;
+  function size(){var r=cv.getBoundingClientRect(),d=window.devicePixelRatio||1;cv.width=Math.round(r.width*d);cv.height=Math.round(r.height*d);ctx=cv.getContext('2d');ctx.scale(d,d);ctx.lineWidth=2.6;ctx.lineCap='round';ctx.lineJoin='round';ctx.strokeStyle='#111';drawn=0}
+  function pos(e){var r=cv.getBoundingClientRect();return{x:e.clientX-r.left,y:e.clientY-r.top}}
+  cv.addEventListener('pointerdown',function(e){if(!ctx)size();last=pos(e);try{cv.setPointerCapture(e.pointerId)}catch(x){}e.preventDefault()});
+  cv.addEventListener('pointermove',function(e){if(!last)return;var p=pos(e);ctx.beginPath();ctx.moveTo(last.x,last.y);ctx.lineTo(p.x,p.y);ctx.stroke();drawn+=Math.abs(p.x-last.x)+Math.abs(p.y-last.y);last=p;e.preventDefault()});
+  ['pointerup','pointercancel','pointerleave'].forEach(function(t){cv.addEventListener(t,function(){last=null})});
+  clr.onclick=function(){size()};
+  setTimeout(size,0);
+  go.onclick=function(){
+    m.textContent='';
+    if(drawn<60){m.textContent='請先在白色框內簽名';return}
+    if(!ai.checked){m.textContent='請勾選同意合約內容';return}
+    var sig=cv.toDataURL('image/png');go.disabled=true;go.textContent='送出中…';
+    api({action:'sign',id:o.id,phone:phone,signature:sig,agree:true}).then(function(r){
+      go.disabled=false;go.textContent='送出簽名';
+      if(!r.ok){m.textContent=r.err;return}
+      var done=r.order;showOrder(box,done,phone);
+      var pr=$('print');pr.textContent='';var pc=el('div','cbox');renderContract(pc,contractLines(done,o.shop),sig);pr.appendChild(pc);
+      var b=el('button','btn','列印／存成 PDF（已簽合約）');b.type='button';b.onclick=function(){window.print()};
+      box.firstChild.appendChild(b);
+    }).catch(function(){go.disabled=false;go.textContent='送出簽名';m.textContent='連線失敗，請再試一次'});
+  };
+  return w;
+}
 $('refToggle').onchange=function(){
   S.ref=this.checked;$('refBox').hidden=!S.ref;
   if(S.ref){if(S.equip==='phone')S.equip='p200';if(S.pick)S.ret=addDays(S.pick,RULES.referral.days-1)}
   renderAll();
 };
-$('region').onchange=renderSum;
+$('region').onchange=renderSum;$('power').onchange=renderSum;$('transfer').onchange=renderSum;
+S.ids={};
+function compress(file){return new Promise(function(res,rej){
+  var u=URL.createObjectURL(file),img=new Image();
+  img.onload=function(){var m=1600,w=img.naturalWidth,h=img.naturalHeight,r=Math.min(1,m/Math.max(w,h)),c=document.createElement('canvas');
+    c.width=Math.round(w*r);c.height=Math.round(h*r);c.getContext('2d').drawImage(img,0,0,c.width,c.height);URL.revokeObjectURL(u);res(c.toDataURL('image/jpeg',0.8))};
+  img.onerror=function(){URL.revokeObjectURL(u);rej(new Error('bad'))};img.src=u;
+})}
+[['idFront','front'],['idBack','back'],['idSecond','second']].forEach(function(x){
+  var inp=$(x[0]),lab=document.querySelector('label[for='+x[0]+']');
+  inp.onchange=function(){var f=inp.files&&inp.files[0];if(!f)return;$('formMsg').textContent='';var em=lab.querySelector('em');em.textContent='處理中…';
+    compress(f).then(function(d){S.ids[x[1]]=d;var im=lab.querySelector('img');im.src=d;im.hidden=false;lab.classList.add('done');em.textContent='已選，點此可更換'})
+      .catch(function(){delete S.ids[x[1]];em.textContent='這張照片讀不到，請換一張';lab.classList.remove('done')})};
+});
 $('pickTime').onchange=function(){renderTimes();renderSum()};
 $('retTime').onchange=renderSum;
 $('prev').onclick=function(){S.m--;if(S.m<0){S.m=11;S.y--}renderCal()};
@@ -308,16 +405,18 @@ $('form').onsubmit=function(ev){
   if($('phone').value.replace(/\D/g,'').length<8){m.textContent='請填寫正確的手機號碼';$('phone').focus();return}
   if(!$('place').value.trim()){m.textContent='請填寫希望的面交地點';$('place').focus();return}
   if(S.ref&&!$('refCode').value.trim()){m.textContent='請填寫介紹碼';$('refCode').focus();return}
+  if(!S.ids.front||!S.ids.back||!S.ids.second){m.textContent='請上傳身分證正反面與第二證件';return}
+  if(!$('idAgree').checked){m.textContent='請勾選同意證件影像的使用說明';return}
   if(!$('adult').checked||!$('agree').checked){m.textContent='請勾選年滿 18 歲並同意規則';return}
-  var btn=$('submit');btn.disabled=true;btn.textContent='送出中…';
+  var btn=$('submit');btn.disabled=true;btn.textContent='上傳中，請勿關閉…';
   var phone=$('phone').value.replace(/\D/g,'');
-  api({action:'book',equip:S.equip,plan:S.ref?'referral':'standard',refCode:$('refCode').value,start:c.start,end:c.end,region:$('region').value,name:$('name').value,phone:phone,social:$('social').value,event:$('event').value,place:$('place').value,adult:true,agree:true,website:$('website').value}).then(function(r){
-    btn.disabled=false;btn.textContent='送出預約';
+  api({action:'book',equip:S.equip,plan:S.ref?'referral':'standard',refCode:$('refCode').value,start:c.start,end:c.end,region:$('region').value,name:$('name').value,phone:phone,social:$('social').value,event:$('event').value,place:$('place').value,adult:true,agree:true,website:$('website').value,power:$('power').checked,transfer:$('transfer').value,ids:S.ids,idAgree:true}).then(function(r){
+    btn.disabled=false;btn.textContent='送出預約與證件';
     if(!r.ok){m.textContent=r.err;refresh();return}
     $('bookView').hidden=true;$('resultView').hidden=false;
     showOrder($('resultView'),r.order,phone);
     window.scrollTo(0,0);
-  }).catch(function(){btn.disabled=false;btn.textContent='送出預約';m.textContent='連線失敗，請再試一次'});
+  }).catch(function(){btn.disabled=false;btn.textContent='送出預約與證件';m.textContent='連線失敗，請再試一次'});
 };
 $('lookupForm').onsubmit=function(ev){
   ev.preventDefault();$('lkMsg').textContent='';
