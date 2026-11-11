@@ -1,4 +1,4 @@
-/* J攝影師租機｜共用規則（網站與後端使用同一份，改規則只改這裡） */
+/* Jspace.cam｜共用規則（網站與後端使用同一份，改規則只改這裡） */
 var API_URL = 'https://script.google.com/macros/s/AKfycbxXNkTHFp_My20SeQMj8teC60qXopGAnd6wyLbkhUvAcZrR_DzuuoI_GjeuDlU19Iz9fQ/exec';
 
 var RULES = {
@@ -173,14 +173,15 @@ function numStr_(n) { return Number(n || 0).toLocaleString('en-US'); }
 function dtParts_(s) { return [s.slice(0, 4), s.slice(5, 7), s.slice(8, 10), s.slice(11, 13), s.slice(14, 16)]; }
 /* o 為訂單（不給則為空白範本），shop = {phone, address} */
 function contractLines(o, shop) {
-  if (!o) return CONTRACT.map(function (c) { return { k: c.k, t: c.t }; });
+  if (!o) return CONTRACT.map(function (c) { return { k: c.k, t: shop && shop.name && c.t.indexOf('姓名／店家名稱') === 0 ? '姓名／店家名稱：' + shop.name : c.t }; });
   shop = shop || {};
   var phone = 0, addr = 0, ref = o.plan === 'referral', eq = RULES.equipment[o.equip] || {};
   var region = o.region === '國外' || o.region === 'foreign' ? '國外' : '國內';
   return CONTRACT.map(function (c) {
     var t = c.t;
     function has(p) { return t.indexOf(p) === 0; }
-    if (has('合約編號')) t = fillBlanks_(t, [o.id]);
+    if (has('姓名／店家名稱') && shop.name) t = '姓名／店家名稱：' + shop.name;
+    else if (has('合約編號')) t = fillBlanks_(t, [o.id]);
     else if (has('聯絡電話')) t = fillBlanks_(t, [phone++ === 0 ? shop.phone : o.phone]);
     else if (has('聯絡地址')) t = fillBlanks_(t, [addr++ === 0 ? shop.address : o.address]);
     else if (has('身分證／護照號碼')) t = fillBlanks_(t, [o.idNo]);
@@ -193,11 +194,11 @@ function contractLines(o, shop) {
     else if (has('二、預定歸還時間')) t = fillBlanks_(t, dtParts_(o.end));
     else if (has('租賃方案')) t = fillBlanks_(t, [o.planLabel + '，' + o.equipLabel + (Number(o.transferQty) ? '，照片影片導出 ' + o.transferQty + ' 次' : '')]);
     else if (has('租賃天數')) t = fillBlanks_(t, [String(o.days)]);
-    else if (has('約定租金')) t = fillBlanks_(t, [numStr_(o.rent)]);
+    else if (has('約定租金')) { var dc = Number(o.discount) || 0; t = fillBlanks_(t, [numStr_(Number(o.rent) - dc)]) + (dc ? '（原價 NT$' + numStr_(o.rent) + '，優惠折讓 NT$' + numStr_(dc) + (o.discountNote ? '：' + o.discountNote : '') + '）' : ''); }
     else if (has('押金：新臺幣')) t = fillBlanks_(t, [numStr_(o.deposit)]);
     else if (has('加購服務')) t = fillBlanks_(t, [numStr_(o.addonFee)]);
     else if (has('預約金（')) t = fillBlanks_(t, [numStr_(o.prepay)]);
-    else if (has('應付總額')) t = fillBlanks_(t, [numStr_(Number(o.rent) + Number(o.deposit) + Number(o.addonFee || 0))]);
+    else if (has('應付總額')) t = fillBlanks_(t, [numStr_(Number(o.rent) - (Number(o.discount) || 0) + Number(o.deposit) + Number(o.addonFee || 0))]);
     else if (has('取機時應付')) t = fillBlanks_(t, [numStr_(o.dueAtPickup)]);
     else if (has('□ 國內租借') && !ref && region === '國內') t = t.replace('□', '☑');
     else if (has('□ 國外租借') && !ref && region === '國外') t = t.replace('□', '☑');
