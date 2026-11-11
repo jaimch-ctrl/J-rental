@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="robots" content="noindex,nofollow">
-<title>Jspace.cam｜管理後台</title>
+<title>租機管理後台</title>
 <style>
 :root{--bg:#0d1626;--panel:#16233a;--panel2:#1d2d49;--line:#30435f;--text:#f2f5fa;--muted:#a9b6c9;--gold:#e9b949;--goldt:#1b1403;--green:#4fd18b;--rose:#fb7185}
 *{box-sizing:border-box}
@@ -63,7 +63,7 @@ button{font-family:inherit;cursor:pointer}
 </head>
 <body>
 <div id="app">
-  <h1>Jspace.cam｜後台</h1>
+  <h1 id="shopName">後台</h1>
   <form id="login">
     <label for="pw">後台密碼</label>
     <input id="pw" type="password" autocomplete="current-password">
@@ -91,6 +91,7 @@ function load(){
   return api({action:'admin_list'}).then(function(r){
     if(!r.ok)throw new Error(r.err);
     A.orders=r.orders;A.shop=r.shop;A.now=r.now;
+    if(r.shop&&r.shop.name){$('shopName').textContent=r.shop.name+'｜後台';document.title=r.shop.name+'｜後台'}
     $('login').hidden=true;$('panel').hidden=false;
     try{sessionStorage.setItem('pw',A.pw)}catch(e){}
     render();
@@ -127,6 +128,7 @@ function card(o){
   if(o.extendFee)kv(c,'加租費',money(o.extendFee));
   if(o.status==='已歸還'){kv(c,'實際歸還',o.returnedAt);kv(c,'逾時費',money(o.lateFee));kv(c,'其他費用',money(o.otherFee));kv(c,'押金退還',money(o.depositBack));if(o.shortfall)kv(c,'應另收',money(o.shortfall))}
   if(o.status==='已取消'){kv(c,'取消原因',o.cancelReason);kv(c,'應退預約金',money(o.refund))}
+  if(o.discount)kv(c,'優惠折讓','－'+money(o.discount)+(o.discountNote?'（'+o.discountNote+'）':''));
   if(o.addonFee||o.power||o.transferQty)kv(c,'加購',(o.power?'行動電源 ':'')+(o.transferQty?'照片導出 '+o.transferQty+' 次 ':'')+money(o.addonFee));
   if(o.status==='證件未通過')kv(c,'未通過原因',o.rejectReason);
   kv(c,'線上簽約',o.signedAt?('已簽 '+o.signedAt):'尚未簽約');
@@ -147,6 +149,7 @@ function card(o){
   if(['已確認','已取機'].indexOf(o.status)>=0)act('延長時間',function(){dlgExtend(o)});
   if(['待審核','待匯款','待對帳','已確認'].indexOf(o.status)>=0&&!o.reschedules)act('改期',function(){dlgResch(o)});
   if(['已確認','已取機','已歸還'].indexOf(o.status)>=0)act('列印合約',function(){showContract(o)});
+  if(['待審核','待匯款','待對帳','已確認'].indexOf(o.status)>=0)act('修改資料／優惠',function(){dlgEdit(o)});
   act('備註',function(){dlgNote(o)});
   if(['待審核','待匯款','待對帳','已確認'].indexOf(o.status)>=0)act('取消訂單',function(){dlgCancel(o)},'danger');
   if(['已歸還','已取消','證件未通過','逾期未付'].indexOf(o.status)>=0&&o.idFolder&&!o.idDeleted)act('刪除證件檔案',function(){dlgDeleteIds(o)},'danger');
@@ -229,6 +232,33 @@ function dlgCancel(o){var r,pv;
     r=field(b,'取消原因','select');[['customer','客人取消'],['noshow','未到場'],['owner','甲方因素（加倍返還）']].forEach(function(x){var e=el('option','',x[1]);e.value=x[0];r.appendChild(e)});
     pv=el('div','preview');b.appendChild(pv);r.onchange=up;up();
   },function(){return{action:'admin_cancel',id:o.id,reason:r.value}},'確認取消');
+}
+function dlgEdit(o){var f={},pv,fin;
+  var minRent=o.prepay,cur=o.rent-(o.discount||0);
+  var phoneQ=(o.plan!=='referral'&&o.equip!=='phone')?calcQuote({equip:'phone',plan:'standard',start:o.start,end:o.end,region:o.region==='國外'?'foreign':'domestic'}):null;
+  function up(){pv.textContent='';var v=Math.round(+fin.value||0),dc=o.rent-v;
+    kv(pv,'原價租金',money(o.rent));
+    kv(pv,'優惠折讓',dc>0?'－'+money(dc):'無');
+    kv(pv,'實收租金',money(v));
+    kv(pv,'已收預約金',money(o.prepay));
+    kv(pv,'取機時收（租金餘額＋押金'+(o.addonFee?'＋加購':'')+'）',money(v-o.prepay+o.deposit+(o.addonFee||0)));
+    if(v>o.rent)kv(pv,'注意','實收不能高於原價 '+money(o.rent));
+    if(v<minRent)kv(pv,'注意','實收最少 '+money(minRent)+'（已收的預約金）');}
+  modal('修改資料／優惠',function(b){
+    if(o.signedAt)b.appendChild(el('p','err','客人已簽約。儲存後會清除簽名，需請客人重新線上簽約。'));
+    b.appendChild(el('h2','','價格'));
+    fin=field(b,'這次實收租金（元）— 跟客人談好的價格直接填這裡','input',{type:'number',min:'0',inputMode:'numeric',value:String(cur)});
+    if(phoneQ&&phoneQ.ok){var qb=el('button','btn','增距鏡免費（照單租手機價 '+money(phoneQ.rent)+'）');qb.type='button';qb.style.width='100%';qb.style.marginTop='8px';
+      qb.onclick=function(){fin.value=String(phoneQ.rent);if(!f.discountNote.value)f.discountNote.value='增距鏡免費租借';up()};b.appendChild(qb)}
+    var rb=el('button','btn','恢復原價');rb.type='button';rb.style.width='100%';rb.style.marginTop='8px';rb.onclick=function(){fin.value=String(o.rent);f.discountNote.value='';up()};b.appendChild(rb);
+    f.discountNote=field(b,'優惠說明（會寫進合約，例：熟客優惠）','input',{type:'text',maxLength:60,value:o.discountNote||''});
+    pv=el('div','preview');b.appendChild(pv);fin.oninput=up;
+    b.appendChild(el('h2','','客人資料'));
+    [['name','姓名','text',40],['phone','手機號碼','tel',20],['idNo','身分證／護照號碼','text',20],['address','聯絡地址','text',120],['emergency','緊急聯絡人及電話','text',80],['place','面交地點','text',80],['event','活動名稱','text',80],['social','IG 或脆帳號','text',60]].forEach(function(x){
+      f[x[0]]=field(b,x[1],'input',{type:x[2],maxLength:x[3],value:o[x[0]]||''})});
+    up();
+  },function(){var v=Math.round(+fin.value||0);if(!(v>=minRent&&v<=o.rent))throw new Error('實收租金要在 '+money(minRent)+' 到 '+money(o.rent)+' 之間');
+    var q={action:'admin_edit',id:o.id,discount:o.rent-v};for(var k in f)q[k]=f[k].value;return q},'儲存');
 }
 function dlgNote(o){var n;modal('備註',function(b){n=field(b,'備註內容','textarea',{rows:4,maxLength:500,value:o.note||''})},function(){return{action:'admin_note',id:o.id,note:n.value}},'儲存')}
 
