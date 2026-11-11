@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>租賃合約範本｜J攝影師租機</title>
+<title>租賃合約範本</title>
 <style>
 body{margin:0;background:#0d1626;color:#f2f5fa;font-family:-apple-system,BlinkMacSystemFont,"PingFang TC","Noto Sans TC","Microsoft JhengHei",sans-serif}
 .bar{max-width:760px;margin:0 auto;padding:18px 16px 10px;display:flex;flex-wrap:wrap;gap:10px;align-items:center;justify-content:space-between}
@@ -22,16 +22,17 @@ body{margin:0;background:#0d1626;color:#f2f5fa;font-family:-apple-system,BlinkMa
 <div class="doc" id="doc"></div>
 <script src="core.js"></script>
 <script>
-(function(){
-  var d=document.getElementById('doc'),bx=null;
+function draw(shop){
+  var d=document.getElementById('doc'),bx=null;d.textContent='';
   function el(t,c,x){var e=document.createElement(t);if(c)e.className=c;e.textContent=x;return e}
-  contractLines(null).forEach(function(c){
+  contractLines(null,shop).forEach(function(c){
     if(c.k==='box'){if(!bx){bx=document.createElement('div');bx.className='bx';d.appendChild(bx)}bx.appendChild(el('p','',c.t));return}
     bx=null;d.appendChild(el(c.k==='h1'?'h3':c.k==='h2'?'h4':'p',c.k==='s'?'s':'',c.t));
   });
-  document.getElementById('pr').onclick=function(){window.print()};
-})();
+}
+draw(null);
+document.getElementById('pr').onclick=function(){window.print()};
+if(API_URL.indexOf('https://')===0)fetch(API_URL,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify({action:'availability'})}).then(function(r){return r.json()}).then(function(r){if(r.ok&&r.shop){draw({name:r.shop});document.title='租賃合約範本｜'+r.shop}}).catch(function(){});
 </script>
 </body>
 </html>
-
